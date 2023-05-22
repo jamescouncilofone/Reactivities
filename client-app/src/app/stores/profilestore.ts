@@ -105,4 +105,29 @@ export default class ProfileStore {
             console.log(error);
         }
     }
+
+    updateProfile = async (profile: Partial<Profile>) => {
+        this.loading = true;
+
+        try {
+            await agent.Profiles.updateProfile(profile);
+
+            runInAction(() => {
+                if (profile.displayName && profile.displayName !== store.userStore.user?.displayName) {
+                    store.userStore.setDisplayName(profile.displayName);
+                }
+
+                // We are setting the Profile with the existing profile and overwriting any changes to the
+                // profile from the partial profile we are passing in as a parameter so we need to make use
+                // of the 'as Profile' to make TypeScript happy.
+                this.profile = {...this.profile, ...profile as Profile};
+                this.loading = false;
+            })
+
+
+        } catch (error) {
+            console.log(error);
+            runInAction(() => this.loading = false);
+        }
+    }
 }
