@@ -11,11 +11,16 @@ export default observer(function ProfilePage() {
     // NOTE: Using the React Router hook to go and get the params from the root parameters.
     const {username} = useParams<{username: string}>();
     const {profileStore} = useStore();
-    const {loadingProfile, loadProfile, profile} = profileStore;
+    const {loadingProfile, loadProfile, profile, setActiveTab} = profileStore;
 
     useEffect(() => {
         if (username) loadProfile(username);
-    }, [loadProfile, username])
+    
+        // NOTE: When this component is disposed then the active tab is reset in the profile store.
+        return () => {
+            setActiveTab(0);
+        }
+    }, [loadProfile, username, setActiveTab])
 
     if (loadingProfile) return <LoadingComponent content='Loading profile...' />
 
